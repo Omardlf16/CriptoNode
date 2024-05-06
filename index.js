@@ -3,6 +3,7 @@ const cipher = require("./cipher/index.js");
 const decipher = require("./decipher/index.js");
 const hash = require("./hash/index.js");
 const hmac = require("./hmac/index.js");
+const diffieHellman = require("./diffie-hellman/index.js");
 const types = ["bytes", "int", "uuid"];
 const encs = ["ascii","utf8","utf-8","utf16le","utf-16le","ucs2","ucs-2","base64","base64url","latin1","binary","hex"];
 const args = process.argv.slice(2);
@@ -126,6 +127,38 @@ switch (options["ch"]) {
   
       console.log(hmac.hmac_hash(options.a, options.k ,options.i, options.enc));
       break;
+
+    case "dh":
+      console.log('Compute keys for diffie-hellman exchange or compute secret from keys if provided\n',
+                  'Flags requered:\n',
+                  'publicKey: alias -pub\t  ["String"]\n',
+                  'prime: alias -prime\t  ["String"]\n',
+                  'generator: alias -gen\t  ["String"]\n',
+                  'privateKey: alias -priv\t  ["String"]\n',
+                  'encoding: alias -enc\t  [default: "hex"]["base64","hex","binary"]\n');
+  
+      if ( options.pub | !["base64","hex","binary"].includes(options.enc) ) {
+        if ( !options.prime | !options.prime | !options.gen | !options.priv ) {   
+          console.error('No choose option provided or params are not valid');
+          console.error('Usage: node index.js -ch dh -pub publicKey -prime prime -gen generator -priv selfPrivateKey');
+          console.error('Values recived ', options);
+          process.exit(1);
+        }
+      }
+
+      let from = null;
+
+      if (options.pub) {
+        from = {
+            prime: options.prime,
+            generator: options.gen,
+            publicKey: options.pub,
+            privateKey: options.priv
+        }
+      }
+  
+      console.log(diffieHellman.diffieHellman(options.enc, from));
+      break;
   default:
-    console.log('Selected option are invalid');
+    console.log('Selected option are invalid use -ch option');
 }
