@@ -4,6 +4,9 @@ const decipher = require("./decipher/index.js");
 const hash = require("./hash/index.js");
 const hmac = require("./hmac/index.js");
 const diffieHellman = require("./diffie-hellman/index.js");
+const keypair = require("./keypair/index.js");
+const verify = require("./verify/index.js");
+const sign = require("./sign/index.js");
 const types = ["bytes", "int", "uuid"];
 const encs = ["ascii","utf8","utf-8","utf16le","utf-16le","ucs2","ucs-2","base64","base64url","latin1","binary","hex"];
 const args = process.argv.slice(2);
@@ -158,6 +161,54 @@ switch (options["ch"]) {
       }
   
       console.log(diffieHellman.diffieHellman(options.enc, from));
+      break;
+    
+    case "verify":
+      console.log('Verify the sign for a file given \n',
+                  'Flags requered:\n',
+                  'publicKey: alias -key\t  ["String"]\n',
+                  'input: alias -i\t  ["String"]\n',
+                  'signature: -sign\t  ["String"]\n');
+  
+      if ( !options.key | !options.i | !options.sign ) {
+        console.error('No choose option provided or params are not valid');
+        console.error('Usage: node index.js -ch verify -pub key -i path -sign sign');
+        console.error('Values recived ', options);
+        process.exit(1);
+      }
+  
+      console.log(verify.verify(options.i, options.key, options.sign));
+      break;
+    case "keypair":
+      console.log('Generate an assymetric key pair\n',
+                  'Flags requered:\n',
+                  'type: alias -t\t  ["String"][rsa, rsa-pss]\n',
+                  'passphrase: alias -p\t  ["String"]\n');
+  
+      if ( !options.p | !["rsa","rsa-pss"].includes(options.t) ) {
+        console.error('No choose option provided or params are not valid');
+        console.error('Usage: node index.js -ch keypair -t rsa -p password');
+        console.error('Values recived ', options);
+        process.exit(1);
+      }
+  
+      console.log(keypair.keypair( options.t, options.p, options.out ));
+      break;
+    case "sign":
+      console.log('Sign a file\n',
+                  'Flags requered:\n',
+                  'key: alias -k\t  ["String"]\n',
+                  'input: alias -i\t  ["String"]\n', 
+                  'passphrase: alias -p\t  ["String"]\n');
+  
+      if ( !options.i | !options.k | !options.p ) {
+        console.error('No choose option provided or params are not valid');
+        console.error('Usage: node index.js -ch sign -k publicKey -i inputPath -p password');
+        console.error('Values recived ', options);
+        process.exit(1);
+      }
+  
+      console.log(sign.sign(options.i, options.k, options.p));
       break;
   default:
     console.log('Selected option are invalid use -ch option');
