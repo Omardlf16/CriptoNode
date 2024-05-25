@@ -21,7 +21,6 @@ function diffieHellman ( encoding, from=false ) {
           };
 
     } else {
-        console.log(from)
         const dh = crypto.createDiffieHellman(
             from.prime,
             encoding,
@@ -42,7 +41,7 @@ function diffieHellman ( encoding, from=false ) {
           secret: secret.toString(encoding)
         };
 
-        return 'Aqui se combinas las claves y se acuerda la key en conjunto';
+        // Aqui se combinas las claves y se acuerda la key en conjunto
     }
   
 }
